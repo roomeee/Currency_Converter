@@ -1,6 +1,6 @@
 import requests
 
-from key import apikey
+from key import api_key
 
 
 def get_currency_symbols(api_key):

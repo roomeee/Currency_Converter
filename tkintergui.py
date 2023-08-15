@@ -1,14 +1,13 @@
 import tkinter as tk
 from tkinter import ttk
 import requests
-from key import apikey
+from key import api_key
 
 def get_currency_symbols(api_key):
-    url = api_key
+    url = "https://api.apilayer.com/exchangerates_data/symbols"
     headers = {
         "apikey": api_key
     }
-
     response = requests.get(url, headers=headers)
 
     if response.status_code == 200:
@@ -30,7 +29,7 @@ def perform_conversion():
         "amount": amount
     }
     headers = {
-        "apikey": apikey
+        "apikey": api_key
     }
 
     response = requests.get(url, params=payload, headers=headers)
@@ -53,35 +52,53 @@ app.title("Currency Converter")
 style = ttk.Style()
 style.configure("TLabel", font=("Helvetica", 12))
 style.configure("TButton", font=("Helvetica", 12))
+style.configure("TCombobox", font=("Helvetica", 12))
 
-currency_symbols = get_currency_symbols(apikey)
+currency_symbols = get_currency_symbols(api_key)
 
 from_currency_var = tk.StringVar()
 to_currency_var = tk.StringVar()
 amount_var = tk.DoubleVar()
 
-from_currency_label = ttk.Label(app, text="From Currency:")
-from_currency_label.pack(pady=5, padx=10, anchor="w")
+# Main frame
+main_frame = ttk.Frame(app, padding=20)
+main_frame.pack(fill="both", expand=True)
 
-from_currency_combobox = ttk.Combobox(app, values=list(currency_symbols.keys()), textvariable=from_currency_var)
-from_currency_combobox.pack(pady=5, padx=10, fill="x")
+# Header
+header_label = ttk.Label(main_frame, text="Currency Converter", font=("Helvetica", 24, "bold"))
+header_label.grid(row=0, column=0, columnspan=2, padx=10, pady=(20, 10))
 
-to_currency_label = ttk.Label(app, text="To Currency:")
-to_currency_label.pack(pady=5, padx=10, anchor="w")
+# From Currency
+from_currency_label = ttk.Label(main_frame, text="From Currency:")
+from_currency_label.grid(row=1, column=0, padx=10, pady=5, sticky="w")
 
-to_currency_combobox = ttk.Combobox(app, values=list(currency_symbols.keys()), textvariable=to_currency_var)
-to_currency_combobox.pack(pady=5, padx=10, fill="x")
+from_currency_combobox = ttk.Combobox(main_frame, values=list(currency_symbols.keys()), textvariable=from_currency_var)
+from_currency_combobox.grid(row=1, column=1, padx=10, pady=5, sticky="w")
 
-amount_label = ttk.Label(app, text="Amount:")
-amount_label.pack(pady=5, padx=10, anchor="w")
+# To Currency
+to_currency_label = ttk.Label(main_frame, text="To Currency:")
+to_currency_label.grid(row=2, column=0, padx=10, pady=5, sticky="w")
 
-amount_entry = ttk.Entry(app, textvariable=amount_var)
-amount_entry.pack(pady=5, padx=10, fill="x")
+to_currency_combobox = ttk.Combobox(main_frame, values=list(currency_symbols.keys()), textvariable=to_currency_var)
+to_currency_combobox.grid(row=2, column=1, padx=10, pady=5, sticky="w")
 
-convert_button = ttk.Button(app, text="Convert", command=perform_conversion)
-convert_button.pack(pady=10)
+# Amount
+amount_label = ttk.Label(main_frame, text="Amount:")
+amount_label.grid(row=3, column=0, padx=10, pady=5, sticky="w")
 
-result_label = ttk.Label(app, text="")
-result_label.pack(pady=5, padx=10)
+amount_entry = ttk.Entry(main_frame, textvariable=amount_var)
+amount_entry.grid(row=3, column=1, padx=10, pady=5, sticky="w")
+
+# Convert button
+convert_button = ttk.Button(main_frame, text="Convert", command=perform_conversion)
+convert_button.grid(row=4, column=0, columnspan=2, pady=20)
+
+# Result label
+result_label = ttk.Label(main_frame, text="", font=("Helvetica", 14, "italic"))
+result_label.grid(row=5, column=0, columnspan=2, padx=10, pady=5, sticky="w")
+
+# Making the columns and rows expand to fill available space
+main_frame.columnconfigure(1, weight=1)
+main_frame.rowconfigure((0, 1, 2, 3, 4, 5), weight=1)
 
 app.mainloop()
